@@ -44,7 +44,7 @@ app.get('/add', (req, res) => {
             }
         });
     } else {
-        res.send({ message: "No user was added" });
+        res.send({ message: "No user was added, add a name parameter to the url like so: `http://.../add?name=Tom`" });
     }
 })
 
