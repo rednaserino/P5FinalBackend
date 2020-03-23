@@ -6,7 +6,7 @@ const path = require("path");
 // Initialiseer de database
 const dbFile = path.join("./sqlite.db");
 const fs = require("fs");
-fs.unlinkSync(dbFile); // uncomment deze lijn tijdelijk als je de database wilt verwijderen
+//fs.unlinkSync(dbFile); // uncomment deze lijn tijdelijk als je de database wilt verwijderen
 const exists = fs.existsSync(dbFile);
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database(dbFile);
