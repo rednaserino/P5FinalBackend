@@ -24,6 +24,12 @@ db.serialize(() => {
   }
 });
 
+// Sta externe communicatie toe
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
 // Voorbeeld van een html response met Express (ter illustratie)
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname + "/index.html"));
