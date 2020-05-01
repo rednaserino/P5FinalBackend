@@ -17,7 +17,7 @@ db.serialize(() => {
   if (!exists) {
     db.run('CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);');
     db.run(
-      'CREATE TABLE Notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT, userId INTEGER, FOREIGN KEY(userId) REFERENCES Users(id));'
+      'CREATE TABLE Notes (id INTEGER PRIMARY KEY AUTOINCREMENT, category INTEGER, content TEXT, userId INTEGER, FOREIGN KEY(userId) REFERENCES Users(id));'
     );
   }
 });
@@ -87,13 +87,15 @@ app.post('/notes', (req, res) => {
   // controleer of de parameters meegegeven zijn
   let userId = req.body.userId; // POST data zit in de HTTP body (en dus niet in de url parameters)
   let content = req.body.content;
+  let category = req.body.category;
+
   if (!userId || !content) {
     res.send({ error: 'Parameters userId and content are required' });
     return;
   }
 
   // haal alle notities van de gebruiker op
-  db.run(`INSERT INTO Notes(content, userId) VALUES(?, ?)`, [content, userId], (err) => {
+  db.run(`INSERT INTO Notes(content, userId, category) VALUES(?, ?, ?)`, [content, userId, category], (err) => {
     if (err) {
       res.send({ error: err });
       return;
