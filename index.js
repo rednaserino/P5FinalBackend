@@ -102,6 +102,23 @@ app.post('/notes', (req, res) => {
   });
 });
 
+// Verwijder een notitie
+app.delete('/notes', (req, res) => {
+  let userId = req.query.userId;
+  let noteId = req.query.noteId;
+  if (!userId || !noteId) {
+    res.send({ error: 'Parameters are required' });
+    return;
+  }
+  db.run(`DELETE FROM Notes WHERE userId=(?) AND id=(?)`, [userId, noteId], (err) => {
+    if (err) {
+      res.send({ error: err });
+      return;
+    }
+    res.send({ success: 'Note deleted' });
+  });
+});
+
 // Antwoord met een lijst van alle notities van een gebruiker
 app.get('/notes', (req, res) => {
   // controleer of de naam parameter is meegegeven
