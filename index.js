@@ -83,36 +83,22 @@ app.post('/users', (req, res) => {
 });
 
 // Voeg een notitie toe
-app.get('/addnote', (req, res) => {
+app.post('/notes', (req, res) => {
   // controleer of de parameters meegegeven zijn
-  let name = req.query.name;
-  let content = req.query.content;
-  if (!name || !content) {
-    res.send({ error: 'Parameters name and content are required' });
+  let userId = req.body.userId; // POST data zit in de HTTP body (en dus niet in de url parameters)
+  let content = req.body.content;
+  if (!userId || !content) {
+    res.send({ error: 'Parameters userId and content are required' });
     return;
   }
 
-  // haal de gebruiker op uit de database
-  db.get(`SELECT id FROM Users WHERE name LIKE ?`, [name], (err, row) => {
-    // return een eventuele error
+  // haal alle notities van de gebruiker op
+  db.run(`INSERT INTO Notes(content, userId) VALUES(?, ?)`, [content, userId], (err) => {
     if (err) {
       res.send({ error: err });
       return;
     }
-    if (!row) {
-      res.send({ error: `No user named ${name}` });
-      return;
-    }
-
-    // haal alle notities van de gebruiker op
-    let userId = row.id;
-    db.run(`INSERT INTO Notes(content, userId) VALUES(?, ?)`, [content, userId], (err) => {
-      if (err) {
-        res.send({ error: err });
-        return;
-      }
-      res.send({ success: 'Inserted note' });
-    });
+    res.send({ success: 'Inserted note' });
   });
 });
 
@@ -151,42 +137,27 @@ app.get('/notes', (req, res) => {
 });
 
 // Verwijdert gebruiker met diens notities
-app.get('/remove', (req, res) => {
+app.delete('/users', (req, res) => {
   // controleer of de naam parameter is meegegeven
-  let name = req.query.name;
-  if (!name) {
-    res.send({ error: 'No name argument found' });
+  let userId = req.query.userId;
+  if (!userId) {
+    res.send({ error: 'No userId argument found' });
     return;
   }
-
-  db.get(`SELECT id FROM Users WHERE name LIKE ?`, [name], (err, row) => {
-    // return bij eventuele error
+  // verwijder notities van de gebruiker
+  db.run(`DELETE FROM Notes WHERE userId = (?)`, [userId], (err) => {
     if (err) {
       res.send({ error: err });
       return;
     }
-    // controleer of een gebruiker met de naam bestaat
-    if (!row) {
-      res.send({ error: `No user named ${name}` });
+  });
+  // verwijder de gebruiker
+  db.run(`DELETE FROM Users WHERE id = (?)`, [userId], (err) => {
+    if (err) {
+      res.send({ error: err });
       return;
     }
-
-    // verwijder notities van de gebruiker
-    let userId = row.id;
-    db.run(`DELETE FROM Notes WHERE userId = (?)`, [userId], (err) => {
-      if (err) {
-        res.send({ error: err });
-        return;
-      }
-    });
-    // verwijder de gebruiker
-    db.run(`DELETE FROM Users WHERE id = (?)`, [userId], (err) => {
-      if (err) {
-        res.send({ error: err });
-        return;
-      }
-      res.send({ success: 'Deleted successfully' });
-    });
+    res.send({ success: 'Deleted successfully' });
   });
 });
 
