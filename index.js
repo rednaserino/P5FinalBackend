@@ -126,12 +126,13 @@ app.put('/notes', (req, res) => {
   let userId = req.body.userId;
   let noteId = req.body.noteId;
   let content = req.body.content;
+  let category = req.body.category;
 
   if (!userId || !noteId || !content) {
     res.send({ error: 'Parameters are required' });
     return;
   }
-  db.run(`UPDATE Notes SET content=(?) WHERE userId=(?) AND id=(?)`, [content, userId, noteId], (err) => {
+  db.run(`UPDATE Notes SET content=(?), category=(?) WHERE userId=(?) AND id=(?)`, [content, category, userId, noteId], (err) => {
     if (err) {
       res.send({ error: err });
       return;
