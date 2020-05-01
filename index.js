@@ -119,6 +119,25 @@ app.delete('/notes', (req, res) => {
   });
 });
 
+// Bewerk een notitie
+app.put('/notes', (req, res) => {
+  let userId = req.body.userId;
+  let noteId = req.body.noteId;
+  let content = req.body.content;
+
+  if (!userId || !noteId || !content) {
+    res.send({ error: 'Parameters are required' });
+    return;
+  }
+  db.run(`UPDATE Notes SET content=(?) WHERE userId=(?) AND id=(?)`, [content, userId, noteId], (err) => {
+    if (err) {
+      res.send({ error: err });
+      return;
+    }
+    res.send({ success: 'Note deleted' });
+  });
+});
+
 // Antwoord met een lijst van alle notities van een gebruiker
 app.get('/notes', (req, res) => {
   // controleer of de naam parameter is meegegeven
