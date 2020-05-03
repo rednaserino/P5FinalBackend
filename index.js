@@ -175,6 +175,24 @@ app.get('/notes', (req, res) => {
   });
 });
 
+app.get('/notes/categoryfilter', (req, res) => {
+  // controleer of de naam parameter is meegegeven
+  let userId = req.query.userId;
+  let category = res.query.category;
+  if (!userId || !category) {
+    res.send({ error: 'No id/cat argument found' });
+    return;
+  }
+
+  db.all('SELECT * from Notes WHERE userId = (?) AND category = (?)', [userId, category], (err, rows) => {
+    if (err) {
+      res.send({ error: err });
+      return;
+    }
+    res.send(JSON.stringify(rows));
+  });
+});
+
 // Verwijdert gebruiker met diens notities
 app.delete('/users', (req, res) => {
   // controleer of de naam parameter is meegegeven
